@@ -1,0 +1,45 @@
+[[smepmp]]
+:description: PMP Enhancements for memory access and execution prevention on Machine mode (Smepmp)
+:company: RISC-V.org
+:revdate: 07/2021
+:revnumber: 0.9.3
+:revremark: Pre-release version
+:url-riscv: http://riscv.org
+:doctype: book
+//:doctype: report
+:preface-title: Preamble
+:colophon:
+:appendix-caption: Appendix
+:imagesdir: Images
+:title-logo-image: image:risc-v_logo.png[pdfwidth=3.25in,align=center]
+//:page-background-image: image:draft.svg[opacity=20%]
+//:title-page-background-image: none
+//:back-cover-image: image:circuit.png[opacity=25%]
+// Settings:
+:experimental:
+:reproducible:
+// needs to be changed? bug discussion started
+//:WaveDromEditorApp: app/wavedrom-editor.app
+:imagesoutdir: Images
+:icons: font
+:lang: en
+:listing-caption: Listing
+:sectnums:
+:toc: left
+:toclevels: 4
+:source-highlighter: pygments
+ifdef::backend-pdf[]
+:source-highlighter: coderay
+endif::[]
+:data-uri:
+:hide-uri-scheme:
+:stem: latexmath
+:footnote:
+:xrefstyle: short
+
+= PMP Enhancements for memory access and execution prevention on Machine mode (Smepmp)
+Nick Kossifidis; Joe Xie; Bill Huffman; Allen Baum; Greg Favor; Tariq Kurd; Fumio Arakawa; RISC-V TEE Task Group
+
+include::Intro.adoc[]
+include::Proposal.adoc[]
+include::Rationale.adoc[]
