@@ -3,7 +3,7 @@
 :company: RISC-V.org
 :revdate: 07/2021
 :revnumber: 0.9.3
-:revremark: Pre-release version
+:revremark: This document is in the Stable state. Assume anything could still change, but limited change should be expected. For more information see: https://riscv.org/spec-state
 :url-riscv: http://riscv.org
 :doctype: book
 //:doctype: report
