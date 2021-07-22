@@ -1,0 +1,152 @@
+[[Memory_Protection_Unit]]
+== Memory Protection Unit(MPU)
+
+An optional RISC-V Memory Protection Unit (MPU) provides per-hart supervisor-mode control registers to allow physical memory access privileges (read, write, execute) to be specified for each physical memory region. The MPU values are checked after the physical address to be accessed pass both the PMA checks and PMP checks described in the privileged spec.
+
+Like PMP, the granularity of MPU access control settings are platform-specific and within a platform may vary by physical memory region, but the standard MPU encoding should support regions as small as four bytes. 
+
+MPU checks could be applied to all accesses for both U mode and S mode, depending on the values in the configuration registers. MPU registers can always be modified by M-mode and S-mode software. MPU registers can grant permissions to U-mode, which has none by default, and revoke permissions from S-mode, which has full permissions by default.
+
+=== Memory Protection Unit Keys
+
+Like PMP, MPU entries are described by an 8-bit configuration register and one XLEN-bit address register. Some MPU settings additionally use the address register associated with the preceding MPU entry. The number of MPU entries can vary by implementation, and up to 16 MPU entries are supported in standard.
+
+The MPU configuration registers are packed into CSRs in the same way as PMP does. For RV32, four CSRs, mpucfg0-mpucfg3, hold the configurations mpu0cfg-mpu15cfg for the 16 MPU entries, as shown in Figure 2. For RV64, mpucfg0 and mpucfg2 hold the configurations for the 16 MPU entries, as shown in Figure 3; mpucfg1 and mpucfg3 are illegal.
+
+
+image::RV32_MPU_configuration_CSR_layout.png[title="RV32 MPU configuration CSR layout"]
+
+image::RV64_MPU_configuration_CSR_layout.png[title="RV64 MPU configuration CSR layout"]
+
+The MPU address registers are CSRs named mpuaddr0-mpuaddr15. Each MPU address register encodes bits 33-2 of 34-bit physical address for RV32, as shown in Figure 4. For RV64, each MPU address encodes bits 55–2 of a 56-bit physical address, as shown in Figure 5. Not all physical address bits may be implemented , and so the mpuaddr registers are WARL.
+
+image::RV32_MPU_address_register_format.png[title="MPU address register format, RV32"]
+
+image::RV64_MPU_address_register_format.png[title="MPU address register format, RV64"]
+
+The layout of MPU configuration registers is the same as PMP configuration registers, as is shown in Figure 6. The R, W, and X bits, when set, indicate that the MPU entry permits read, write and instruction execution, respectively. When one of these bits is clear, the corresponding access type is denied. 
+
+The S bit represents whether an MPU entry is for S-mode. When an MPU entry is for U-mode （S = 0), the permission will be enforced in U-mode and restrict the access by S-mode (for SMAP and SMEP); otherwise（S = 1), the MPU entry is for S-mode and the permission checking is enforced in S-mode. MPU also introduces shared data and code regions. The encoding for permission is shown in section 2.3, which is the same as ePMP (except MPU does not need a lockdown bit). 
+
+The remaining field, A bit, will be described in the following sections (2.2).
+
+image::MPU_configuration_register_format.png[title="MPU configuration register format"]
+
+*The number of MPU entries*: The proposal advocates 16 MPU entries, which can provide 16 isolated regions concurrently. To provide more isolation regions, the software in S-mode (usually an OS) can virtualize more isolated regions and schedule them by switching the values in MPU entries. 
+
+=== Address Matching
+Like PMP’s design, the A field in an MPU entry’s configuration register encodes the address-matching mode of the associated MPU address register. The encoding of A field is the same as PMP’s, as shown in Table 1. When A=0, this MPU entry is disabled and matches no address. Two other address-matching modes are supported: naturally aligned power-of-2 regions (NAPOT), including the special case of naturally aligned four-byte regions (NA4); and the top boundary of an arbitrary range (TOR). These modes support four-byte granularity.
+
+image::Encoding_of_A_field.png[Table, title="Encoding of A field in MPU configuration registers"]
+
+NAPOT ranges make use of the low-order bits of the associated address register to encode the size of the range, as shown in Table 2.
+
+image::NAPOT_range_encoding.png[Table, title="NAPOT range encoding in MPU address and configuration registers"]
+
+If TOR is selected, the associated address register forms the top of the address range, and the preceding MPU register forms the bottom of the address range. If MPU entry i’s A field is set to TOR, the entry matches any address such that mpuaddr i-1 ≤ a < mpuaddr i. If MPU entry 0’s A field is set to TOR, zero is used for the lower bound, and so it matches any address a < mpuaddr0.
+
+=== Encoding of Permissions
+MPU has three kinds of regions: U-mode region, S-mode region, and shared regions. Normally, when the S bit is set, the region could be either a S-mode region or a shared region. When the S bit is clear, the region could be either a U-mode region or a shared region.
+
+S-mode regions indicate that the R/W/X permissions are enforced on S-mode accesses. M-mode accesses are not affected and U-mode access will trigger faults. 
+For U-mode regions, any S-mode access matching the MPU entry will trigger faults; the R/W/X permissions apply only to U modes.
+For shared regions, the permissions are enforced for both U and S modes, according to the table below.
+
+S-mode can always modify the value in S bit.
+
+The encoding and results are shown in the table (SUM=0):
+
+[cols="^1,^1,^1,^1,^4,^4",stripes=even,options="header"]
+|===
+4+|Bits on _mpucfg_ register 2+|Result
+|S|R|W|X|S Mode|U Mode
+|0|0|0|0 2+|Inaccessible region (Access Exception)
+|0|0|0|1|Access Exception|Execute-only region
+|0|0|1|0 2+|Shared data region: Read/write on S mode, read-only on U mode
+|0|0|1|1 2+|Shared data region: Read/write for both S and U mode
+|0|1|0|0|Access Exception|Read-only region
+|0|1|0|1|Access Exception|Read/Execute region
+|0|1|1|0|Access Exception|Read/Write region
+|0|1|1|1|Access Exception|Read/Write/Execute region
+|1|0|0|0 2+|Reserved
+|1|0|0|1|Execute-only region|Access Exception
+|1|0|1|0 2+|Shared code region: Execute only on both S and U mode
+|1|0|1|1 2+|Shared code region: Execute only on U mode, read/execute on S mode
+|1|1|0|0|Read-only region|Access Exception
+|1|1|0|1|Read/Execute region|Access Exception
+|1|1|1|0|Read/Write region|Access Exception
+|1|1|1|1 2+|Shared data region: Read only on both S and U mode
+|===
+
+*SUM bit*: We re-use the SUM (permit Supervisor User Memory access) bit in sstatus to modify the privilege with which S-mode loads and stores access physical memory. When SUM=0, S-mode memory accesses to U-mode regions will trigger fault, as shown in the table. When SUM=1, these accesses are permitted. The semantics of SUM in MPU is consistent with it in paging.
+SUM only affects S-mode behaviors on U-mode regions. It does not affect S-mode regions and shared regions, as shown in the following tables. 
+If the MPU feature is implemented, SUM must be writable. (SUM is hardwired to 0 if paging isn't implemented in current priv spec.)
+
+[NOTE]
+====
+MPU does not permit supervisor mode to execute instructions from U-mode regions, regardless of the SUM setting.
+====
+
+=== Priority and Matching Logic
+The PMP checks only take effect after the memory access passes the MPU permission checks. An M-mode access will not be checked by MPU property.
+
+Like PMP entries, MPU entries are also statically prioritized. The lowest-numbered MPU entry that matches any byte of an access determines whether that access succeeds or fails. The matching MPU entry must match all bytes of an access, or the access fails, irrespective of the S, R, W, and X bits.
+
+If an MPU entry matches all bytes of an access, then the S, R, W and X bits determine whether the access succeeds or fails. If the privilege mode of the access is M, the access succeeds. Otherwise, the access succeeds only if it satisfies the permission checking with the  S, R, W, or X bit corresponding to the access type.
+
+If no MPU entry matches an S-mode access, the access succeeds; otherwise the access is checked according to the permission bits in MPU entry. If no MPU entry matches an U-mode access, but at least one MPU entry is implemented, the access fails.
+
+=== Exceptions
+Failed accesses generate an exception. MPU follows the strategy that uses different exception codes for different cases, i.e., load/store/instruction faults for memory load, memory store and instruction fetch respectively.
+
+The MPU reuses exception codes of page fault for MPU fault. This is because page fault is typically delegated to S-mode, and so does MPU, so we can benefit from reusing page fault. S-mode software(i.e., OS) has enough information to distinguish page fault from MPU fault. The *MPU is proposing to rename page fault to MPU/MMU fault for clarity*. 
+
+Note that a single instruction may generate multiple accesses, which may not be mutually atomic. 
+
+Table of renamed exception codes:
+
+[cols="^1,^1,^1", stripes=even, options="header"]
+|===
+|Interrupt|Exception Code|Description
+|0|12|Instruction MPU/MMU fault
+|0|13|Load MPU/MMU fault
+|0|15|Store/AMO MPU/MMU fault
+|===
+
+[NOTE]
+====
+You can refer to the Table 3.6 in riscv-privileged spec.
+====
+
+*Delegation*: Unlike PMP which uses access faults for violations, MPU uses MPU/MMU faults for violations. The benefit of using MPU/MMU faults is that we can delegate the violations caused by MPU to S-mode, while the access violations caused by PMP can still be handled by machine mode.
+
+=== Enabling and Disabling MPU
+MPU is enabled by default when it exists. This is consistent with PMP.
+
+When a device has both MPU and MMU (or paging), and the S-mode software wants to disable MPU to only use paging, it can configure one MPU entry covering all addresses to grant all permissions to both S-mode and U-mode.
+
+=== MPU and Paging
+The table below shows which mechanism to use. (Assume both MMU and MPU are implemented.)
+
+[cols="^1,^1", stripes=even, options="header"]
+|===
+|Value in satp|Isolation mechanism
+|0 (bare mode)|MPU only
+|non-zero|MMU only
+|===
+
+
+
+
+
+[NOTE]
+====
+If page-based virtual memory is not implemented, or when it is disabled, memory accesses check the MPU settings synchronously, so no fence is needed.
+====
+
+=== Context Switching Optimization
+With MPU, each context switch requires the OS to store 16 address registers and 2 configuration registers (RV64), which is costly and unnecessary. So the MPU is proposing an optimization to minimize the overhead caused by context switching. 
+
+We add one CSR called *_mpuswitch_*, which is an XLEN-bit read/write register, formatted as shown in Figure 7. The low 16 bits of this register holds on/off status of the corresponding MPU region respectively. The high 48 bits is reserved for future use (e.g., extending to more MPU regions). During context switch, the OS can simply store and restore mpuswitch as part of the context. A region is activated only when both corresponding bits in mpuswitch and A field of mpuicfg are set. (i.e., mpuswitch[i] & mpuicfg.A)
+
+image::MPU_domain_switch_register_format.png[title="MPU domain switch register format"]

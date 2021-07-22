@@ -41,6 +41,7 @@ endif::[]
 Dong Du; Xu Lu; Bicheng Yang; Wenhao Li; Yubin Xia; Nick Kossifidis; Joe Xie; Paul Ku; Bill Huffman; Jonathan Behrens; Allen Baum; Robin Zheng; Zeyu Mi; RISC-V TEE Task Group
 
 
-include::Intro.adoc[]
-include::Proposal.adoc[]
-include::Rationale.adoc[]
+include::Motivation.adoc[]
+include::Memory_Protection_Unit.adoc[]
+include::Summary_of_Hardware_Changes.adoc[]
+include::Interaction_with_other_proposals.adoc[]
