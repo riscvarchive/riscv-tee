@@ -1,0 +1,47 @@
+[[mpu]]
+:description: RISC-V Memory Protection Unit (MPU)
+:company: RISC-V.org
+:revdate: 07/2021
+:revnumber: 0.9.3
+:revremark: This document is in the Stable state. Assume anything could still change, but limited change should be expected. For more information see: https://riscv.org/spec-state
+:url-riscv: http://riscv.org
+:doctype: book
+//:doctype: report
+:preface-title: Preamble
+:colophon:
+:appendix-caption: Appendix
+:imagesdir: Images
+:title-logo-image: image:risc-v_logo.png[pdfwidth=3.25in,align=center]
+//:page-background-image: image:draft.svg[opacity=20%]
+//:title-page-background-image: none
+//:back-cover-image: image:circuit.png[opacity=25%]
+// Settings:
+:experimental:
+:reproducible:
+// needs to be changed? bug discussion started
+//:WaveDromEditorApp: app/wavedrom-editor.app
+:imagesoutdir: Images
+:icons: font
+:lang: en
+:listing-caption: Listing
+:sectnums:
+:toc: left
+:toclevels: 4
+:source-highlighter: pygments
+ifdef::backend-pdf[]
+:source-highlighter: coderay
+endif::[]
+:data-uri:
+:hide-uri-scheme:
+:stem: latexmath
+:footnote:
+:xrefstyle: short
+
+= RISC-V Memory Protection Unit (MPU)
+Dong Du; Xu Lu; Bicheng Yang; Wenhao Li; Yubin Xia; Nick Kossifidis; Joe Xie; Paul Ku; Bill Huffman; Jonathan Behrens; Allen Baum; Robin Zheng; Zeyu Mi; RISC-V TEE Task Group
+
+
+include::Motivation.adoc[]
+include::Memory_Protection_Unit.adoc[]
+include::Summary_of_Hardware_Changes.adoc[]
+include::Interaction_with_other_proposals.adoc[]

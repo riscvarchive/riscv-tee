@@ -128,7 +128,7 @@ block:
   margin_top: 0
   margin_bottom: $vertical_rhythm
 caption:
-  align: left
+  align: center
   font_size: $base_font_size * 0.95
   font_style: italic
   # FIXME perhaps set line_height instead of / in addition to margins?
@@ -218,7 +218,7 @@ example:
   # FIXME reenable padding bottom once margin collapsing is implemented
   padding: [$vertical_rhythm, $horizontal_rhythm, 0, $horizontal_rhythm]
 image:
-  align: left
+  align: center
 prose:
   margin_top: $block_margin_top
   margin_bottom: $block_margin_bottom
@@ -239,7 +239,7 @@ outline_list:
   item_spacing: $vertical_rhythm / 2
 table:
   background_color: $page_background_color
-  #head_background_color: <hex value>
+  head_background_color: 9dc284
   #head_font_color: $base_font_color
   head_font_style: bold
   #body_background_color: <hex value>

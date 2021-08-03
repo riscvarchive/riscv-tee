@@ -1,0 +1,13 @@
+[[Summary_of_Hardware_Changes]]
+== Summary of Hardware Changes
+
+[cols="^1,^1",stripes=even, options="header"]
+|===
+|Item|Changes
+|CSRs for MPU address|16 new CSRs
+|CSRs for MPU configuration|4 new CSRs for RV32 and 2 for RV64
+|CSR for Domain switch|1 new CSR
+|Renamed exception code| *_Instruction page fault_* renamed to *_Instruction MPU/MMU fault_* +
+*_Load page fault_* renamed to *_Load MPU/MMU fault_* +
+*_Store/AMO page fault_* renamed to *_Store/AMO MPU/MMU fault_*
+|===
