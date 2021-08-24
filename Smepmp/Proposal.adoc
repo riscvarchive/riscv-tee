@@ -1,9 +1,9 @@
 [[proposal]]
 == Proposal
 
-. *Machine Security Configuration (mseccfg)* is a new Machine mode CSR, used for configuring various security mechanisms present on the hart, and only accessible to Machine mode. It is only available on harts with PMP support and / or the Zkr (Scalar Crypto) extension. It is 64bit, and is at address *0x747 on RV64* and *0x747 (low 32bits), 0x757 (high 32bits) on RV32*. All bits except bit0 - bit2 and bit8 are reserved for now and all mseccfg fields defined on this proposal are RW. The reset value of mseccfg is implementation-specific, otherwise if backwards compatibility is a requirement it should reset to zero on hard reset. On harts without PMP support bit0 - bit2 must be hardwired to zero.
+. *Machine Security Configuration (mseccfg)* is a new RW Machine mode CSR, used for configuring various security mechanisms present on the hart, and only accessible to Machine mode. It is 64bit, and is at address *0x747 on RV64* and *0x747 (low 32bits), 0x757 (high 32bits) on RV32*. All bits except bits 2:0 are reserved for now and all mseccfg fields defined on this proposal are WARL. The reset value of mseccfg is implementation-specific, otherwise if backwards compatibility is a requirement it should reset to zero on hard reset.
 
-. On ``mseccfg`` we introduce a field on bit2 called *Rule Locking Bypass (mseccfg.RLB)* with the following functionality: 
+. On ``mseccfg`` we introduce a field on bit 2 called *Rule Locking Bypass (mseccfg.RLB)* with the following functionality:
 +
 [CAUTION]
 ====
@@ -12,12 +12,12 @@ Note that this feature is intended to be used as a debug mechanism, or as a temp
 
 .. When ``mseccfg.RLB`` is 1 *locked* PMP rules may be removed/modified and *locked* PMP entries may be edited.
 
-.. When ``mseccfg.RLB`` is 0 and ``pmpcfg.L`` is 1 in any rule or entry (including disabled entries), then ``mseccfg.RLB`` is locked to 0 and any further modifications to ``mseccfg.RLB` are ignored (WARL).
+.. When ``mseccfg.RLB`` is 0 and ``pmpcfg.L`` is 1 in any rule or entry (including disabled entries), then ``mseccfg.RLB`` is locked to 0 and any further modifications to ``mseccfg.RLB`` are ignored (WARL).
 
 
-. On ``mseccfg`` we introduce a field in bit1 called *Machine Mode Whitelist Policy (mseccfg.MMWP)*. This is a sticky bit, meaning that once set it cannot be unset until a *PMP reset*. When set it changes the default PMP policy for M-mode when accessing memory regions that don’t have a matching PMP rule, to *denied* instead of *ignored*.
+. On ``mseccfg`` we introduce a field in bit 1 called *Machine Mode Whitelist Policy (mseccfg.MMWP)*. This is a sticky bit, meaning that once set it cannot be unset until a *PMP reset*. When set it changes the default PMP policy for M-mode when accessing memory regions that don’t have a matching PMP rule, to *denied* instead of *ignored*.
 
-. On ``mseccfg`` we introduce a field in bit0 called *Machine Mode Lockdown (mseccfg.MML)*. This is a sticky bit, meaning that once set it cannot be unset until a *PMP reset*. When ``mseccfg.MML`` is set the system's behavior changes in the following way:
+. On ``mseccfg`` we introduce a field in bit 0 called *Machine Mode Lockdown (mseccfg.MML)*. This is a sticky bit, meaning that once set it cannot be unset until a *PMP reset*. When ``mseccfg.MML`` is set the system's behavior changes in the following way:
 
 .. The meaning of ``pmpcfg.L`` changes: Instead of marking a rule as *locked* and *enforced* in all modes, it now marks a rule as *M-mode-only* when set and *S/U-mode-only* when unset. The formerly reserved encoding of ``pmpcfg.RW=01``, and the encoding ``pmpcfg.LRWX=1111``, now encode a *Shared-Region*.
 +
