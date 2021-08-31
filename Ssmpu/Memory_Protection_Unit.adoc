@@ -7,6 +7,11 @@ Like PMP, the granularity of MPU access control settings are platform-specific a
 
 MPU checks could be applied to all accesses for both U mode and S mode, depending on the values in the configuration registers. MPU registers can always be modified by M-mode and S-mode software. MPU registers can grant permissions to U-mode, which has none by default, and revoke permissions from S-mode, which has full permissions by default.
 
+=== Requirements
+
+1) S mode should be implemented
+
+
 === Memory Protection Unit Keys
 
 Like PMP, MPU entries are described by an 8-bit configuration register and one XLEN-bit address register. Some MPU settings additionally use the address register associated with the preceding MPU entry. The number of MPU entries can vary by implementation, and up to 16 MPU entries are supported in standard.
