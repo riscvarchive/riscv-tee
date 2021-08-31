@@ -23,7 +23,7 @@ image::RV32_MPU_configuration_CSR_layout.png[title="RV32 MPU configuration CSR l
 
 image::RV64_MPU_configuration_CSR_layout.png[title="RV64 MPU configuration CSR layout"]
 
-The MPU address registers are CSRs named mpuaddr0-mpuaddr15. Each MPU address register encodes bits 33-2 of 34-bit physical address for RV32, as shown in Figure 4. For RV64, each MPU address encodes bits 55–2 of a 56-bit physical address, as shown in Figure 5. Not all physical address bits may be implemented , and so the mpuaddr registers are WARL.
+The MPU address registers are CSRs named mpuaddr0-mpuaddr15. Each MPU address register encodes bits 33-2 of 34-bit physical address for RV32, as shown in Figure 4. For RV64, each MPU address encodes bits 55–2 of a 56-bit physical address, as shown in Figure 5. Not all physical address bits may be implemented (but implemented RW bits must be contiguous), and so the mpuaddr registers are WARL.
 
 image::RV32_MPU_address_register_format.png[title="MPU address register format, RV32"]
 
@@ -38,6 +38,9 @@ The remaining field, A bit, will be described in the following sections (2.2).
 image::MPU_configuration_register_format.png[title="MPU configuration register format"]
 
 *The number of MPU entries*: The proposal advocates 16 MPU entries, which can provide 16 isolated regions concurrently. To provide more isolation regions, the software in S-mode (usually an OS) can virtualize more isolated regions and schedule them by switching the values in MPU entries. 
+
+*The reset state*: The reset state of all MPU CSRs should be zero.
+
 
 === Address Matching
 Like PMP’s design, the A field in an MPU entry’s configuration register encodes the address-matching mode of the associated MPU address register. The encoding of A field is the same as PMP’s, as shown in Table 1. When A=0, this MPU entry is disabled and matches no address. Two other address-matching modes are supported: naturally aligned power-of-2 regions (NAPOT), including the special case of naturally aligned four-byte regions (NA4); and the top boundary of an arbitrary range (TOR). These modes support four-byte granularity.
