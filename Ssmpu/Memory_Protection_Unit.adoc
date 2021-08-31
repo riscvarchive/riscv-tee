@@ -100,9 +100,10 @@ The PMP checks only take effect after the memory access passes the MPU permissio
 
 Like PMP entries, MPU entries are also statically prioritized. The lowest-numbered MPU entry that matches any byte of an access determines whether that access succeeds or fails. The matching MPU entry must match all bytes of an access, or the access fails, irrespective of the S, R, W, and X bits.
 
-If an MPU entry matches all bytes of an access, then the S, R, W and X bits determine whether the access succeeds or fails. If the privilege mode of the access is M, the access succeeds. Otherwise, the access succeeds only if it satisfies the permission checking with the  S, R, W, or X bit corresponding to the access type.
-
-If no MPU entry matches an S-mode access, the access succeeds; otherwise the access is checked according to the permission bits in MPU entry. If no MPU entry matches an U-mode access, but at least one MPU entry is implemented, the access fails.
+1. If the privilege mode of the access is M, the access succeeds;
+2. If the privilege mode of the access is S and no MPU entry matches, the access succeeds;
+3. If the privilege mode of the access is U and no MPU entry matches, but at least one MPU entry is implemented, the access fails;
+4. Otherwise, the access is checked according to the permission bits in the matching MPU entry and succeeds only if it satisfies the permission checking with the S, R, W, or X bit corresponding to the access type.
 
 === Exceptions
 Failed accesses generate an exception. MPU follows the strategy that uses different exception codes for different cases, i.e., load/store/instruction faults for memory load, memory store and instruction fetch respectively.
