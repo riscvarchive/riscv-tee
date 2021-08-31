@@ -128,9 +128,12 @@ If page-based virtual memory is not implemented, or when it is disabled, memory 
 ====
 
 === Exceptions
-Failed accesses generate an exception. MPU follows the strategy that uses different exception codes for different cases, i.e., load/store/instruction faults for memory load, memory store and instruction fetch respectively.
+Failed accesses generate an exception. MPU follows the strategy that uses different exception codes for different cases, i.e., load, store/AMO, instruction faults for memory load, memory store/AMO and instruction fetch respectively.
 
-The MPU reuses exception codes of page fault for MPU fault. This is because page fault is typically delegated to S-mode, and so does MPU, so we can benefit from reusing page fault. S-mode software(i.e., OS) has enough information to distinguish page fault from MPU fault. The *MPU is proposing to rename page fault to MPU/MMU fault for clarity*. 
+The MPU reuses exception codes of page fault for MPU fault.
+This is because page fault is typically delegated to S-mode, and so does MPU, so we can benefit from reusing page fault.
+S-mode software(i.e., OS) can distinguish page fault from MPU fault by checking satp.mode (as mentioned in 2.6, MPU and MMU will not be activated simultaneously).
+The *MPU is proposing to rename page fault to MPU/MMU fault for clarity*.
 
 Note that a single instruction may generate multiple accesses, which may not be mutually atomic. 
 
