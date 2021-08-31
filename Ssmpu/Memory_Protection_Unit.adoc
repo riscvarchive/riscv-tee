@@ -105,6 +105,28 @@ Like PMP entries, MPU entries are also statically prioritized. The lowest-number
 3. If the privilege mode of the access is U and no MPU entry matches, but at least one MPU entry is implemented, the access fails;
 4. Otherwise, the access is checked according to the permission bits in the matching MPU entry and succeeds only if it satisfies the permission checking with the S, R, W, or X bit corresponding to the access type.
 
+=== MPU and Paging
+The table below shows which mechanism to use. (Assume both MMU and MPU are implemented.)
+
+[cols="^1,^1", stripes=even, options="header"]
+|===
+|Value in satp|Isolation mechanism
+|0 (bare mode)|MPU only
+|non-zero|MMU only
+|===
+
+We do not enable both MPU and MMU now because:
+(1) It will introduce one more layer to check permission for each memory access. This issue will be more serious for guest OS which may have host MPU and guest MPU.
+(2) MMU can provide sufficient protection.
+
+That means, MPU is enabled when satp.mode=Bare and  MPU is implemented.
+
+
+[NOTE]
+====
+If page-based virtual memory is not implemented, or when it is disabled, memory accesses check the MPU settings synchronously, so no fence is needed.
+====
+
 === Exceptions
 Failed accesses generate an exception. MPU follows the strategy that uses different exception codes for different cases, i.e., load/store/instruction faults for memory load, memory store and instruction fetch respectively.
 
@@ -129,29 +151,7 @@ You can refer to the Table 3.6 in riscv-privileged spec.
 
 *Delegation*: Unlike PMP which uses access faults for violations, MPU uses MPU/MMU faults for violations. The benefit of using MPU/MMU faults is that we can delegate the violations caused by MPU to S-mode, while the access violations caused by PMP can still be handled by machine mode.
 
-=== Enabling and Disabling MPU
-MPU is enabled by default when it exists. This is consistent with PMP.
 
-When a device has both MPU and MMU (or paging), and the S-mode software wants to disable MPU to only use paging, it can configure one MPU entry covering all addresses to grant all permissions to both S-mode and U-mode.
-
-=== MPU and Paging
-The table below shows which mechanism to use. (Assume both MMU and MPU are implemented.)
-
-[cols="^1,^1", stripes=even, options="header"]
-|===
-|Value in satp|Isolation mechanism
-|0 (bare mode)|MPU only
-|non-zero|MMU only
-|===
-
-
-
-
-
-[NOTE]
-====
-If page-based virtual memory is not implemented, or when it is disabled, memory accesses check the MPU settings synchronously, so no fence is needed.
-====
 
 === Context Switching Optimization
 With MPU, each context switch requires the OS to store 16 address registers and 2 configuration registers (RV64), which is costly and unnecessary. So the MPU is proposing an optimization to minimize the overhead caused by context switching. 
