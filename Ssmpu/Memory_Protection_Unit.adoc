@@ -159,6 +159,6 @@ You can refer to the Table 3.6 in riscv-privileged spec.
 === Context Switching Optimization
 With MPU, each context switch requires the OS to store 16 address registers and 2 configuration registers (RV64), which is costly and unnecessary. So the MPU is proposing an optimization to minimize the overhead caused by context switching. 
 
-We add one CSR called *_mpuswitch_*, which is an XLEN-bit read/write register, formatted as shown in Figure 7. The low 16 bits of this register holds on/off status of the corresponding MPU region respectively. The high 48 bits is reserved for future use (e.g., extending to more MPU regions). During context switch, the OS can simply store and restore mpuswitch as part of the context. A region is activated only when both corresponding bits in mpuswitch and A field of mpuicfg are set. (i.e., mpuswitch[i] & mpuicfg.A)
+We add one CSR called *_mpuswitch_*, which is an XLEN-bit read/write register, formatted as shown in Figure 7. The low 16 bits of this register holds on/off status of the corresponding MPU region respectively. The high 48 bits is reserved for future use (e.g., extending to more MPU regions). During context switch, the OS can simply store and restore mpuswitch as part of the context. A region is activated only when both corresponding bits in mpuswitch and A field of mpuicfg are set. (i.e., mpuswitch[i] & mpu[i]cfg.A)
 
 image::MPU_domain_switch_register_format.png[title="MPU domain switch register format"]
