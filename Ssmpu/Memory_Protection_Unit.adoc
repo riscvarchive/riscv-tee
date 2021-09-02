@@ -62,7 +62,7 @@ For shared regions, the permissions are enforced for both U and S modes, accordi
 
 S-mode can always modify the value in S bit.
 
-The encoding and results are shown in the table (SUM=0):
+The encoding and results are shown in the table:
 
 [cols="^1,^1,^1,^1,^3,^3,^3",stripes=even,options="header"]
 |===
@@ -88,7 +88,7 @@ The encoding and results are shown in the table (SUM=0):
 |===
 
 *SUM bit*: We re-use the SUM (permit Supervisor User Memory access) bit in sstatus to modify the privilege with which S-mode loads and stores access physical memory. When SUM=0, S-mode memory accesses to U-mode regions will trigger fault, as shown in the table. When SUM=1, these accesses are permitted. The semantics of SUM in MPU is consistent with it in paging.
-SUM only affects S-mode behaviors on U-mode regions. It does not affect S-mode regions and shared regions, as shown in the following tables. 
+SUM only affects S-mode behaviors on U-mode regions. It does not affect S-mode regions and shared regions.
 If the MPU feature is implemented, SUM must be writable. (SUM is hardwired to 0 if paging isn't implemented in current priv spec.)
 
 [NOTE]
