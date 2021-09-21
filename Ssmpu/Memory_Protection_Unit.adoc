@@ -29,17 +29,19 @@ image::RV32_MPU_address_register_format.png[title="MPU address register format, 
 
 image::RV64_MPU_address_register_format.png[title="MPU address register format, RV64"]
 
-The layout of MPU configuration registers is the same as PMP configuration registers, as is shown in Figure 6. The R, W, and X bits, when set, indicate that the MPU entry permits read, write and instruction execution, respectively. When one of these bits is clear, the corresponding access type is denied. 
+The layout of MPU configuration registers is the same as PMP configuration registers, as is shown in Figure 6.
+The X/W/R field controls instruction execution, write and read permissions.
 
-The S bit represents whether an MPU entry is for S-mode. When an MPU entry is for U-mode （S = 0), the permission will be enforced in U-mode and restrict the access by S-mode (for SMAP and SMEP); otherwise（S = 1), the MPU entry is for S-mode and the permission checking is enforced in S-mode. MPU also introduces shared data and code regions. The encoding for permission is shown in section 2.3, which is the same as ePMP (except MPU does not need a lockdown bit). 
+The S bit represents whether an MPU entry is for S-mode. When an MPU entry is for U-mode （S = 0), the permission will be enforced in U-mode and restrict the access by S-mode (for SMAP and SMEP); otherwise（S = 1), the MPU entry is for S-mode and the permission checking is enforced in S-mode. MPU also introduces shared data and code regions. The encoding for permission is shown in section 2.4, which is the same as ePMP (except MPU does not need a lockdown bit).
 
-The remaining field, A bit, will be described in the following sections (2.2).
+The remaining field, A bit, will be described in the following sections (2.3).
 
 image::MPU_configuration_register_format.png[title="MPU configuration register format"]
 
 *The number of MPU entries*: The proposal advocates 16 MPU entries, which can provide 16 isolated regions concurrently. To provide more isolation regions, the software in S-mode (usually an OS) can virtualize more isolated regions and schedule them by switching the values in MPU entries. 
 
-*The reset state*: The reset state of all MPU CSRs should be zero.
+*The reset state*: On system reset, the A field of mpu[i]cfg should be zero.
+
 
 
 === Address Matching
