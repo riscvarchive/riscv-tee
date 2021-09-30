@@ -20,7 +20,7 @@ Like PMP, MPU entries are described by an 8-bit configuration register and one X
 
 The MPU configuration registers are packed into CSRs in the same way as PMP does. For RV32, 16 CSRs, mpucfg0-mpucfg15, hold the configurations mpu0cfg-mpu63cfg for the 64 MPU entries.
 For RV64, even numbered CSRs (i.e., mpucfg0, mpucfg2, ..., mpucfg14) hold the configurations for the 64 MPU entries; odd numbered CSRs (e.g., mpucfg1) are illegal.
-Figure 2 and 3 demonstrate the first 16 entries of MPU, the layout of rest entries are similar.
+Figure 2 and 3 demonstrate the first 16 entries of MPU, the layout of rest entries is similar.
 
 
 image::RV32_MPU_configuration_CSR_layout.png[title="RV32 MPU configuration CSR layout"]
@@ -66,7 +66,7 @@ It is the same as PMP/ePMP.
 
 MPU has three kinds of rules: *U-mode-only*, *S-mode-only*, and *Shared-Region* rules.
 The S bit marks a rule as *S-mode-only* when set and *U-mode-only* when unset.
-The encoding ``mpucfg.SRWX=1000`` is reserved and the encoding ``mpucfg.RW=01`` and the encoding ``mpucfg.SRWX=1111`` encodes a Shared-Region.
+The encoding ``mpucfg.SRWX=1000`` is reserved and the encoding ``mpucfg.RW=01`` and the encoding ``mpucfg.SRWX=1111`` encode a Shared-Region.
 
 
 . An _S-mode-only_ rule is *enforced* on Supervisor mode and *denied* on User mode.
@@ -181,8 +181,8 @@ So the MPU is proposing an optimization to minimize the overhead caused by conte
 
 We add two CSRs called *_mpuswitch0_* and *_mpuswitch1_*, which are XLEN-bit read/write registers, formatted as shown in Figure 7.
 For RV64, only *_mpuswitch0_* is used.
-Each bit of this register holds on/off status of the corresponding MPU region respectively.
+Each bit of this register holds on/off status of the corresponding MPU entry respectively.
 During context switch, the OS can simply store and restore mpuswitch as part of the context.
-A region is activated only when both corresponding bits in mpuswitch and A field of mpuicfg are set. (i.e., mpuswitch[i] & mpu[i]cfg.A)
+An MPU entry is activated only when both corresponding bits in mpuswitch and A field of mpuicfg are set. (i.e., mpuswitch[i] & mpu[i]cfg.A)
 
 image::MPU_domain_switch_register_format.png[title="MPU domain switch register format (RV64)"]

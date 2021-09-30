@@ -24,7 +24,7 @@ When V=1, and hgatp.MODE=Bare, hgMPU is used to provide isolation between hyperv
 3. XLEN-bit read/write hgmpuswitch0 and hgmpuswitch1 CSRs are also provided in hgMPU, which are identical to mpuswitch0 and mpuswitch1 shown in Figure 7.
 Only hgmpuswitch0 is used for RV64.
 During context switch, the hypervisor can simply store and restore hgmpuswitch (we use hgmpuswitch to represent either hgmpuswitch0 or hgmpuswitch1) as part of the context.
-A region is activated only when both corresponding bits in hgmpuswitch and A field of hgmpuicfg are set. (i.e., hgmpuswitch[i] & hgmpuicfg.A)
+An hgMPU entry is activated only when both corresponding bits in hgmpuswitch and A field of hgmpuicfg are set. (i.e., hgmpuswitch[i] & hgmpuicfg.A)
 4. The hgMPU checking is performed after the guest address translation (or vMPU checking), before PMP checking.
 
 As hgMPU does not apply on hypervisor, the encodings of configuration registers are simplified as the following table.
