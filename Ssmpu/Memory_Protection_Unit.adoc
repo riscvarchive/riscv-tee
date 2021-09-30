@@ -29,7 +29,8 @@ image::RV64_MPU_configuration_CSR_layout.png[title="RV64 MPU configuration CSR l
 
 The MPU address registers are CSRs named mpuaddr0-mpuaddr63.
 Each MPU address register encodes bits 33-2 of 34-bit physical address for RV32, as shown in Figure 4.
-For RV64, each MPU address encodes bits 55–2 of a 56-bit physical address, as shown in Figure 5. Not all physical address bits may be implemented (but implemented RW bits must be contiguous), and so the mpuaddr registers are WARL.
+Fewer address bits may be implemented for systems with a smaller physical address space.
+Implemented address bits must be contiguous and have to go from lower to higher bits.
 
 image::RV32_MPU_address_register_format.png[title="MPU address register format, RV32"]
 
