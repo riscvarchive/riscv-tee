@@ -47,15 +47,9 @@ image::MPU_configuration_register_format.png[title="MPU configuration register f
 
 
 === Address Matching
-Like PMP’s design, the A field in an MPU entry’s configuration register encodes the address-matching mode of the associated MPU address register. The encoding of A field is the same as PMP’s, as shown in Table 1. When A=0, this MPU entry is disabled and matches no address. Two other address-matching modes are supported: naturally aligned power-of-2 regions (NAPOT), including the special case of naturally aligned four-byte regions (NA4); and the top boundary of an arbitrary range (TOR). These modes support four-byte granularity.
 
-image::Encoding_of_A_field.png[Table, title="Encoding of A field in MPU configuration registers"]
-
-NAPOT ranges make use of the low-order bits of the associated address register to encode the size of the range, as shown in Table 2.
-
-image::NAPOT_range_encoding.png[Table, title="NAPOT range encoding in MPU address and configuration registers"]
-
-If TOR is selected, the associated address register forms the top of the address range, and the preceding MPU register forms the bottom of the address range. If MPU entry i’s A field is set to TOR, the entry matches any address such that mpuaddr i-1 ≤ a < mpuaddr i. If MPU entry 0’s A field is set to TOR, zero is used for the lower bound, and so it matches any address a < mpuaddr0.
+The A field in an MPU entry’s configuration register encodes the address-matching mode of the associated MPU address register.
+It is the same as PMP/ePMP.
 
 === Encoding of Permissions
 MPU has three kinds of regions: U-mode region, S-mode region, and shared regions. Normally, when the S bit is set, the region could be either a S-mode region or a shared region. When the S bit is clear, the region could be either a U-mode region or a shared region.
