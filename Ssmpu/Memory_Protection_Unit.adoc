@@ -16,16 +16,20 @@ MPU registers can always be modified by M-mode and S-mode software. MPU register
 
 === Memory Protection Unit CSRs
 
-Like PMP, MPU entries are described by an 8-bit configuration register and one XLEN-bit address register. Some MPU settings additionally use the address register associated with the preceding MPU entry. The number of MPU entries can vary by implementation, and up to 16 MPU entries are supported in standard.
+Like PMP, MPU entries are described by an 8-bit configuration register and one XLEN-bit address register. Some MPU settings additionally use the address register associated with the preceding MPU entry. The number of MPU entries can vary by implementation, and up to 64 MPU entries are supported in standard.
 
-The MPU configuration registers are packed into CSRs in the same way as PMP does. For RV32, four CSRs, mpucfg0-mpucfg3, hold the configurations mpu0cfg-mpu15cfg for the 16 MPU entries, as shown in Figure 2. For RV64, mpucfg0 and mpucfg2 hold the configurations for the 16 MPU entries, as shown in Figure 3; mpucfg1 and mpucfg3 are illegal.
+The MPU configuration registers are packed into CSRs in the same way as PMP does. For RV32, 16 CSRs, mpucfg0-mpucfg15, hold the configurations mpu0cfg-mpu63cfg for the 64 MPU entries.
+For RV64, even numbered CSRs (i.e., mpucfg0, mpucfg2, ..., mpucfg14) hold the configurations for the 64 MPU entries; odd numbered CSRs (e.g., mpucfg1) are illegal.
+Figure 2 and 3 demonstrate the first 16 entries of MPU, the layout of rest entries are similar.
 
 
 image::RV32_MPU_configuration_CSR_layout.png[title="RV32 MPU configuration CSR layout"]
 
 image::RV64_MPU_configuration_CSR_layout.png[title="RV64 MPU configuration CSR layout"]
 
-The MPU address registers are CSRs named mpuaddr0-mpuaddr15. Each MPU address register encodes bits 33-2 of 34-bit physical address for RV32, as shown in Figure 4. For RV64, each MPU address encodes bits 55–2 of a 56-bit physical address, as shown in Figure 5. Not all physical address bits may be implemented (but implemented RW bits must be contiguous), and so the mpuaddr registers are WARL.
+The MPU address registers are CSRs named mpuaddr0-mpuaddr63.
+Each MPU address register encodes bits 33-2 of 34-bit physical address for RV32, as shown in Figure 4.
+For RV64, each MPU address encodes bits 55–2 of a 56-bit physical address, as shown in Figure 5. Not all physical address bits may be implemented (but implemented RW bits must be contiguous), and so the mpuaddr registers are WARL.
 
 image::RV32_MPU_address_register_format.png[title="MPU address register format, RV32"]
 
@@ -40,7 +44,7 @@ The remaining field, A bit, will be described in the following sections (2.3).
 
 image::MPU_configuration_register_format.png[title="MPU configuration register format"]
 
-*The number of MPU entries*: The proposal advocates 16 MPU entries, which can provide 16 isolated regions concurrently. To provide more isolation regions, the software in S-mode (usually an OS) can virtualize more isolated regions and schedule them by switching the values in MPU entries. 
+*The number of MPU entries*: The proposal advocates 64 MPU entries, which can provide 64 isolated regions concurrently. To provide more isolation regions, the software in S-mode (usually an OS) can virtualize more isolated regions and schedule them by switching the values in MPU entries. 
 
 *The reset state*: On system reset, the A field of mpu[i]cfg should be zero.
 
@@ -156,8 +160,13 @@ You can refer to the Table 3.6 in riscv-privileged spec.
 
 
 === Context Switching Optimization
-With MPU, each context switch requires the OS to store 16 address registers and 2 configuration registers (RV64), which is costly and unnecessary. So the MPU is proposing an optimization to minimize the overhead caused by context switching. 
+With MPU, each context switch requires the OS to store 64 address registers and 8 configuration registers (RV64), which is costly and unnecessary.
+So the MPU is proposing an optimization to minimize the overhead caused by context switching.
 
-We add one CSR called *_mpuswitch_*, which is an XLEN-bit read/write register, formatted as shown in Figure 7. The low 16 bits of this register holds on/off status of the corresponding MPU region respectively. The high 48 bits is reserved for future use (e.g., extending to more MPU regions). During context switch, the OS can simply store and restore mpuswitch as part of the context. A region is activated only when both corresponding bits in mpuswitch and A field of mpuicfg are set. (i.e., mpuswitch[i] & mpu[i]cfg.A)
+We add two CSRs called *_mpuswitch0_* and *_mpuswitch1_*, which are XLEN-bit read/write registers, formatted as shown in Figure 7.
+For RV64, only *_mpuswitch0_* is used.
+Each bit of this register holds on/off status of the corresponding MPU region respectively.
+During context switch, the OS can simply store and restore mpuswitch as part of the context.
+A region is activated only when both corresponding bits in mpuswitch and A field of mpuicfg are set. (i.e., mpuswitch[i] & mpu[i]cfg.A)
 
-image::MPU_domain_switch_register_format.png[title="MPU domain switch register format"]
+image::MPU_domain_switch_register_format.png[title="MPU domain switch register format (RV64)"]
