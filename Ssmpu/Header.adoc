@@ -44,4 +44,5 @@ Dong Du; Xu Lu; Bicheng Yang; Wenhao Li; Yubin Xia; Nick Kossifidis; Joe Xie; Pa
 include::Motivation.adoc[]
 include::Memory_Protection_Unit.adoc[]
 include::Summary_of_Hardware_Changes.adoc[]
+include::Interaction_with_hypervisor_extension.adoc[]
 include::Interaction_with_other_proposals.adoc[]
