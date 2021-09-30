@@ -69,11 +69,11 @@ The encoding ``mpucfg.SRWX=1000`` is reserved and the encoding ``mpucfg.RW=01`` 
 
 . An _S-mode-only_ rule is *enforced* on Supervisor mode and *denied* on User mode.
 +
-. A _U-mode-only_ rule is *enforced* on User modes and *denied*/*enforced* on Supervisor mode depending on the value of ``satp.SUM`` bit:
+. A _U-mode-only_ rule is *enforced* on User modes and *denied*/*enforced* on Supervisor mode depending on the value of ``sstatus.SUM`` bit:
 +
-* If ``satp.SUM`` is set, a U-mode-only rule is enforced yet non-executable on Supervisor mode in order to ensure SMEP.
+* If ``sstatus.SUM`` is set, a U-mode-only rule is enforced yet non-executable on Supervisor mode in order to ensure SMEP.
 +
-* If ``satp.SUM`` is unset, a U-mode-only rule is denied on Supervisor mode.
+* If ``sstatus.SUM`` is unset, a U-mode-only rule is denied on Supervisor mode.
 +
 . A _Shared-Region_ rule is enforced on both Supervisor and User modes, with restrictions depending on the ``mpucfg.S`` and ``mpucfg.X`` bits:
 +
@@ -109,14 +109,8 @@ The encoding and results are shown in the table:
 |1|1|1|1 3+|Shared data region: Read only on both S and U mode
 |===
 
-*SUM bit*: We re-use the SUM (permit Supervisor User Memory access) bit in sstatus to modify the privilege with which S-mode loads and stores access physical memory. When SUM=0, S-mode memory accesses to U-mode regions will trigger fault, as shown in the table. When SUM=1, these accesses are permitted. The semantics of SUM in MPU is consistent with it in paging.
-SUM only affects S-mode behaviors on U-mode regions. It does not affect S-mode regions and shared regions.
-If the MPU feature is implemented, SUM must be writable. (SUM is hardwired to 0 if paging isn't implemented in current priv spec.)
+**SUM bit**: We re-use the sstatus.SUM (permit Supervisor User Memory access) bit to modify the privilege with which S-mode loads and stores access physical memory. The semantics of SUM in MPU is consistent with it in paging.
 
-[NOTE]
-====
-MPU does not permit supervisor mode to execute instructions from U-mode regions, regardless of the SUM setting.
-====
 
 === Priority and Matching Logic
 The PMP checks only take effect after the memory access passes the MPU permission checks. An M-mode access will not be checked by MPU property.
