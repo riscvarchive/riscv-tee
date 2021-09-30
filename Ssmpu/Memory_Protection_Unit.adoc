@@ -37,9 +37,12 @@ image::RV32_MPU_address_register_format.png[title="MPU address register format, 
 image::RV64_MPU_address_register_format.png[title="MPU address register format, RV64"]
 
 The layout of MPU configuration registers is the same as PMP configuration registers, as is shown in Figure 6.
-The X/W/R field controls instruction execution, write and read permissions.
+The X/W/R bitsd controls instruction execution, write and read permissions.
 
-The S bit represents whether an MPU entry is for S-mode. When an MPU entry is for U-mode （S = 0), the permission will be enforced in U-mode and restrict the access by S-mode (for SMAP and SMEP); otherwise（S = 1), the MPU entry is for S-mode and the permission checking is enforced in S-mode. MPU also introduces shared data and code regions. The encoding for permission is shown in section 2.4, which is the same as ePMP (except MPU does not need a lockdown bit).
+The S bit marks a rule as *S-mode-only* when set and *U-mode-only* when unset.
+The reserved encoding of ``mpucfg.RW=01``, and the encoding ``mpucfg.SRWX=1111``, now encode a Shared-Region.
+The rules and encodings for permission are explained in section 2.4, which resembles the encoding of ePMP (except MPU doesn't use locked rules).
+
 
 The remaining field, A bit, will be described in the following sections (2.3).
 
@@ -57,13 +60,29 @@ The A field in an MPU entry’s configuration register encodes the address-match
 It is the same as PMP/ePMP.
 
 === Encoding of Permissions
-MPU has three kinds of regions: U-mode region, S-mode region, and shared regions. Normally, when the S bit is set, the region could be either a S-mode region or a shared region. When the S bit is clear, the region could be either a U-mode region or a shared region.
 
-S-mode regions indicate that the R/W/X permissions are enforced on S-mode accesses. M-mode accesses are not affected and U-mode access will trigger faults. 
-For U-mode regions, any S-mode access matching the MPU entry will trigger faults; the R/W/X permissions apply only to U modes.
-For shared regions, the permissions are enforced for both U and S modes, according to the table below.
 
-S-mode can always modify the value in S bit.
+MPU has three kinds of rules: *U-mode-only*, *S-mode-only*, and *Shared-Region* rules.
+The S bit marks a rule as *S-mode-only* when set and *U-mode-only* when unset.
+The encoding ``mpucfg.SRWX=1000`` is reserved and the encoding ``mpucfg.RW=01`` and the encoding ``mpucfg.SRWX=1111`` encodes a Shared-Region.
+
+
+. An _S-mode-only_ rule is *enforced* on Supervisor mode and *denied* on User mode.
++
+. A _U-mode-only_ rule is *enforced* on User modes and *denied*/*enforced* on Supervisor mode depending on the value of ``satp.SUM`` bit:
++
+* If ``satp.SUM`` is set, a U-mode-only rule is enforced yet non-executable on Supervisor mode in order to ensure SMEP.
++
+* If ``satp.SUM`` is unset, a U-mode-only rule is denied on Supervisor mode.
++
+. A _Shared-Region_ rule is enforced on both Supervisor and User modes, with restrictions depending on the ``mpucfg.S`` and ``mpucfg.X`` bits:
++
+* If ``mpucfg.S`` is not set the region can be used for sharing data between S-mode and U-mode so is not executable. S-mode has RW access to that region and U-mode has read access if ``mpucfg.X`` is not set, or RW access if ``mpucfg.X`` is set.
++
+* If ``mpucfg.S`` is set the region can be used for sharing code between S-mode and U-mode so is not writeable. Both S-mode and U-mode have execute access on the region and S-mode may also have read access if ``mpucfg.X`` is set.
++
+* The encoding ``mpucfg.SRWX=1111`` can be used for sharing data between S-mode and U mode, where both modes only have read-only access to the region.
+
 
 The encoding and results are shown in the table:
 
@@ -102,12 +121,12 @@ MPU does not permit supervisor mode to execute instructions from U-mode regions,
 === Priority and Matching Logic
 The PMP checks only take effect after the memory access passes the MPU permission checks. An M-mode access will not be checked by MPU property.
 
-Like PMP entries, MPU entries are also statically prioritized. The lowest-numbered MPU entry that matches any byte of an access determines whether that access succeeds or fails. The matching MPU entry must match all bytes of an access, or the access fails, irrespective of the S, R, W, and X bits.
+Like PMP entries, MPU entries are also statically prioritized. The lowest-numbered MPU entry that matches any byte of an access determines whether that access is allowed or fails. The matching MPU entry must match all bytes of an access, or the access fails, irrespective of the S, R, W, and X bits.
 
-1. If the privilege mode of the access is M, the access succeeds;
-2. If the privilege mode of the access is S and no MPU entry matches, the access succeeds;
+1. If the privilege mode of the access is M, the access is allowed;
+2. If the privilege mode of the access is S and no MPU entry matches, the access is allowed;
 3. If the privilege mode of the access is U and no MPU entry matches, but at least one MPU entry is implemented, the access fails;
-4. Otherwise, the access is checked according to the permission bits in the matching MPU entry and succeeds only if it satisfies the permission checking with the S, R, W, or X bit corresponding to the access type.
+4. Otherwise, the access is checked according to the permission bits in the matching MPU entry and is allowed only if it satisfies the permission checking with the S, R, W, or X bit corresponding to the access type.
 
 === MPU and Paging
 The table below shows which mechanism to use. (Assume both MMU and MPU are implemented.)
