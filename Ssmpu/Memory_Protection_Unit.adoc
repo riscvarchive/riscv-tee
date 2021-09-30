@@ -36,15 +36,17 @@ image::RV32_MPU_address_register_format.png[title="MPU address register format, 
 
 image::RV64_MPU_address_register_format.png[title="MPU address register format, RV64"]
 
-The layout of MPU configuration registers is the same as PMP configuration registers, as is shown in Figure 6.
-The X/W/R bitsd controls instruction execution, write and read permissions.
+The layout of MPU configuration registers is the same as PMP configuration registers, as is shown in Figure 6. The whole register is WARL.
 
-The S bit marks a rule as *S-mode-only* when set and *U-mode-only* when unset.
+. The S bit marks a rule as *S-mode-only* when set and *U-mode-only* when unset.
 The reserved encoding of ``mpucfg.RW=01``, and the encoding ``mpucfg.SRWX=1111``, now encode a Shared-Region.
 The rules and encodings for permission are explained in section 2.4, which resembles the encoding of ePMP (except MPU doesn't use locked rules).
 
+. Bit 5 and 6 are reserved for future use.
 
-The remaining field, A bit, will be described in the following sections (2.3).
+. The A bit will be described in the following sections (2.3).
+
+. The X/W/R bits control instruction execution, write and read permissions.
 
 image::MPU_configuration_register_format.png[title="MPU configuration register format"]
 
