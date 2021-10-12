@@ -6,7 +6,7 @@ An optional RISC-V Memory Protection Unit (MPU) provides per-hart supervisor-mod
 Like PMP, the granularity of MPU access control settings are platform-specific and within a platform may vary by physical memory region, but the standard MPU encoding should support regions as small as four bytes. 
 
 MPU checks will be applied to all accesses for both U mode and S mode, depending on the values in the configuration registers.
-M-mode accesses are not affected.
+M-mode accesses are not affected and always pass MPU permission checks.
 MPU registers can always be modified by M-mode and S-mode software. MPU registers can grant permissions to U-mode, which has none by default, and revoke permissions from S-mode, which has all permissions allowed through PMP/ePMP by default.
 
 === Requirements
@@ -56,7 +56,7 @@ The rules and encodings for permission are explained in section 2.4, which resem
 
 image::MPU_configuration_register_format.png[title="MPU configuration register format"]
 
-*The number of MPU entries*: The proposal advocates 64 MPU entries, which can provide 64 isolated regions concurrently. To provide more isolation regions, the software in S-mode (usually an OS) can virtualize more isolated regions and schedule them by switching the values in MPU entries. 
+*The number of MPU entries*: The proposal allows 64 MPU entries, which can provide 64 isolated regions concurrently. To provide more isolation regions, the software in S-mode (usually an OS) can virtualize more isolated regions and schedule them by switching the values in MPU entries.
 
 *The reset state*: On system reset, the A field of mpu[i]cfg should be zero.
 
@@ -116,11 +116,13 @@ The encoding and results are shown in the table:
 |1|1|1|1 3+|Shared data region: Read only on both S and U mode
 |===
 
-**SUM bit**: We re-use the sstatus.SUM (permit Supervisor User Memory access) bit to modify the privilege with which S-mode loads and stores access physical memory. The semantics of SUM in MPU is consistent with it in paging.
+**SUM bit**: We re-use the sstatus.SUM (allow Supervisor User Memory access) bit to modify the privilege with which S-mode loads and stores access physical memory. The semantics of SUM in MPU is consistent with it in paging.
 
 
 === Priority and Matching Logic
-The PMP checks only take effect after the memory access passes the MPU permission checks. An M-mode access will not be checked by MPU property.
+M-mode accesses are always considered to pass MPU checks.
+If PMP/ePMP is implemented, then accesses succeed only if both PMP/ePMP and MPU permission checks pass.
+
 
 Like PMP entries, MPU entries are also statically prioritized. The lowest-numbered MPU entry that matches any byte of an access determines whether that access is allowed or fails. The matching MPU entry must match all bytes of an access, or the access fails, irrespective of the S, R, W, and X bits.
 
@@ -139,7 +141,7 @@ The table below shows which mechanism to use. (Assume both MMU and MPU are imple
 |non-zero|MMU only
 |===
 
-We do not enable both MPU and MMU now because:
+We do not allow both MPU and MMU permissions active at the same time now because:
 (1) It will introduce one more layer to check permission for each memory access. This issue will be more serious for guest OS which may have host MPU and guest MPU.
 (2) MMU can provide sufficient protection.
 
