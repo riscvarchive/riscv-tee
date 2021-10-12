@@ -5,9 +5,9 @@ An optional RISC-V Memory Protection Unit (MPU) provides per-hart supervisor-mod
 
 Like PMP, the granularity of MPU access control settings are platform-specific and within a platform may vary by physical memory region, but the standard MPU encoding should support regions as small as four bytes. 
 
-MPU checks could be applied to all accesses for both U mode and S mode, depending on the values in the configuration registers.
+MPU checks will be applied to all accesses for both U mode and S mode, depending on the values in the configuration registers.
 M-mode accesses are not affected.
-MPU registers can always be modified by M-mode and S-mode software. MPU registers can grant permissions to U-mode, which has none by default, and revoke permissions from S-mode, which has full permissions by default.
+MPU registers can always be modified by M-mode and S-mode software. MPU registers can grant permissions to U-mode, which has none by default, and revoke permissions from S-mode, which has all permissions allowed through PMP/ePMP by default.
 
 === Requirements
 
@@ -17,6 +17,11 @@ MPU registers can always be modified by M-mode and S-mode software. MPU register
 === Memory Protection Unit CSRs
 
 Like PMP, MPU entries are described by an 8-bit configuration register and one XLEN-bit address register. Some MPU settings additionally use the address register associated with the preceding MPU entry. The number of MPU entries can vary by implementation, and up to 64 MPU entries are supported in standard.
+
+[NOTE]
+====
+The terms, entry and rule, are similar to ePMP.
+====
 
 The MPU configuration registers are packed into CSRs in the same way as PMP does. For RV32, 16 CSRs, mpucfg0-mpucfg15, hold the configurations mpu0cfg-mpu63cfg for the 64 MPU entries.
 For RV64, even numbered CSRs (i.e., mpucfg0, mpucfg2, ..., mpucfg14) hold the configurations for the 64 MPU entries; odd numbered CSRs (e.g., mpucfg1) are illegal.
@@ -29,6 +34,7 @@ image::RV64_MPU_configuration_CSR_layout.png[title="RV64 MPU configuration CSR l
 
 The MPU address registers are CSRs named mpuaddr0-mpuaddr63.
 Each MPU address register encodes bits 33-2 of 34-bit physical address for RV32, as shown in Figure 4.
+For RV64, each MPU address encodes bits 55–2 of a 56-bit physical address, as shown in Figure 5.
 Fewer address bits may be implemented for systems with a smaller physical address space.
 Implemented address bits must be contiguous and have to go from lower to higher bits.
 
@@ -39,7 +45,7 @@ image::RV64_MPU_address_register_format.png[title="MPU address register format, 
 The layout of MPU configuration registers is the same as PMP configuration registers, as is shown in Figure 6. The whole register is WARL.
 
 . The S bit marks a rule as *S-mode-only* when set and *U-mode-only* when unset.
-The reserved encoding of ``mpucfg.RW=01``, and the encoding ``mpucfg.SRWX=1111``, now encode a Shared-Region.
+The encoding of ``mpucfg.RW=01``, and the encoding ``mpucfg.SRWX=1111``, now encode a Shared-Region.
 The rules and encodings for permission are explained in section 2.4, which resembles the encoding of ePMP (except MPU doesn't use locked rules).
 
 . Bit 5 and 6 are reserved for future use.
@@ -66,20 +72,19 @@ It is the same as PMP/ePMP.
 
 MPU has three kinds of rules: *U-mode-only*, *S-mode-only*, and *Shared-Region* rules.
 The S bit marks a rule as *S-mode-only* when set and *U-mode-only* when unset.
-The encoding ``mpucfg.SRWX=1000`` is reserved and the encoding ``mpucfg.RW=01`` and the encoding ``mpucfg.SRWX=1111`` encode a Shared-Region.
-
+The encoding ``mpucfg.RW=01`` encodes a Shared-Region and ``mpucfg.SRWX=1000`` is reserved for future standard use.
 
 . An _S-mode-only_ rule is *enforced* on Supervisor mode and *denied* on User mode.
 +
 . A _U-mode-only_ rule is *enforced* on User modes and *denied*/*enforced* on Supervisor mode depending on the value of ``sstatus.SUM`` bit:
 +
-* If ``sstatus.SUM`` is set, a U-mode-only rule is enforced yet non-executable on Supervisor mode in order to ensure SMEP.
+* If ``sstatus.SUM`` is set, a U-mode-only rule is enforced yet without code execution permission on Supervisor mode in order to ensure SMEP.
 +
 * If ``sstatus.SUM`` is unset, a U-mode-only rule is denied on Supervisor mode.
 +
 . A _Shared-Region_ rule is enforced on both Supervisor and User modes, with restrictions depending on the ``mpucfg.S`` and ``mpucfg.X`` bits:
 +
-* If ``mpucfg.S`` is not set the region can be used for sharing data between S-mode and U-mode so is not executable. S-mode has RW access to that region and U-mode has read access if ``mpucfg.X`` is not set, or RW access if ``mpucfg.X`` is set.
+* If ``mpucfg.S`` is not set the region can be used for sharing data between S-mode and U-mode so is not executable. S-mode has RW access to that region and U-mode has read-only access if ``mpucfg.X`` is not set, or RW access if ``mpucfg.X`` is set.
 +
 * If ``mpucfg.S`` is set the region can be used for sharing code between S-mode and U-mode so is not writeable. Both S-mode and U-mode have execute access on the region and S-mode may also have read access if ``mpucfg.X`` is set.
 +
