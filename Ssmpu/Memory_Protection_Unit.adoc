@@ -35,7 +35,7 @@ image::RV64_MPU_configuration_CSR_layout.png[title="RV64 MPU configuration CSR l
 The MPU address registers are CSRs named mpuaddr0-mpuaddr63.
 Each MPU address register encodes bits 33-2 of 34-bit physical address for RV32, as shown in Figure 4.
 For RV64, each MPU address encodes bits 55–2 of a 56-bit physical address, as shown in Figure 5.
-Fewer address bits may be implemented for systems with a smaller physical address space.
+Fewer address bits may be implemented for specific reasons, e.g., systems have a smaller physical address space.
 Implemented address bits must be contiguous and have to go from lower to higher bits.
 
 image::RV32_MPU_address_register_format.png[title="MPU address register format, RV32"]
@@ -52,7 +52,7 @@ The rules and encodings for permission are explained in section 2.4, which resem
 
 . The A bit will be described in the following sections (2.3).
 
-. The X/W/R bits control instruction execution, write and read permissions.
+. The R/W/X bits control read, write, and instruction execution permissions.
 
 image::MPU_configuration_register_format.png[title="MPU configuration register format"]
 
@@ -124,7 +124,7 @@ M-mode accesses are always considered to pass MPU checks.
 If PMP/ePMP is implemented, then accesses succeed only if both PMP/ePMP and MPU permission checks pass.
 
 
-Like PMP entries, MPU entries are also statically prioritized. The lowest-numbered MPU entry that matches any byte of an access determines whether that access is allowed or fails. The matching MPU entry must match all bytes of an access, or the access fails, irrespective of the S, R, W, and X bits.
+Like PMP entries, MPU entries are also statically prioritized. The lowest-numbered MPU entry that matches any byte of an access (indicated by an address and the accessed length) determines whether that access is allowed or fails. The matching MPU entry must match all bytes of an access, or the access fails, irrespective of the S, R, W, and X bits.
 
 1. If the privilege mode of the access is M, the access is allowed;
 2. If the privilege mode of the access is S and no MPU entry matches, the access is allowed;
