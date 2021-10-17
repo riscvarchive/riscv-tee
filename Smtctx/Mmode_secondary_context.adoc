@@ -13,11 +13,11 @@ The proposal currently has two requirements:
 
 The proposal introduces new fields in mseccfg and pmpcfg, which together implement the trusted context extension.
 
-First, we add two new fields in mseccfg: SCP (Secondary context extension) and PC (Primary context) fields, as shown in the following Figure.
+First, we add two new fields in mseccfg: SCP (Secondary context extension present) and PC (Primary context) fields, as shown in the following Figure.
 
 TODO: figure-1 to show mseccfg extension
 
-- `mseccfg.SCP` (Secondary context extension): SCP is hardwired to 1 in case this extension is implemented.
+- `mseccfg.SCP` (Secondary context extension present): SCP is hardwired to 1 in case this extension is implemented.
 
 - `mseccfg.PC` (Primary context): represents whether the current M-mode is in Primary context (its value is 1) or in Secondary Context (its value is 0).
 
@@ -26,7 +26,7 @@ On hart reset, `mseccfg.PC` is set to 1.
 Any writes to mseccfg.PC are ignored (WARL).
 
 
-Second, we add one new fiedl in each pmpcfg: S (rules for the Secondary context), as shown in the following Figure.
+Second, we add one new field in each pmpcfg, the S field (represents rules for the Secondary context), as shown in the following Figure.
 
 image::PMP_config_layout.png[title="PMP configuration register format with secondary context extension."]
 

@@ -9,5 +9,3 @@ On a system with S-mode available, we would have the secure monitor on M-mode an
 
 We propose this proposal to provide primary and secondary contexts on M-mode, achieving isolation between different contexts.
 The extension targets M/U-only systems.
-
-// image::Comparison_of_PMP_and_MPU.png[title="Comparison of PMP and MPU"]
