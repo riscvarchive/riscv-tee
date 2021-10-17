@@ -28,7 +28,7 @@ Any writes to mseccfg.PC are ignored (WARL).
 
 Second, we add one new fiedl in each pmpcfg: S (rules for the Secondary context), as shown in the following Figure.
 
-TODO: figure-2 to show pmpcfg.S extension
+image::PMP_config_layout.png[title="PMP configuration register format with secondary context extension."]
 
 - `pmpcfg.S`: the rule is applied to a secondary context.
 
