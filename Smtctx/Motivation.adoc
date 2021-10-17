@@ -1,11 +1,13 @@
 [[Motivation]]
 == Motivation
 
-The major goal of M-mode trusted context extension is to offer a way for trusted OSes/Services/Drivers to run on M-mode, isolated from the secure monitor/firmware and from each-other, on M/U-only systems.
+The major goal of M-mode secondary context extension is to offer a way for trusted OSes, services, and drivers to run on M-mode, which can be isolated from the secure monitor and firmware and from each other.
 
+Having all those elements (OSes, services, and drivers) running at the highest privilege together with the secure monitor, without memory isolation between them, increases the attack surface of the system.
+Moreover, some or all of these elements may be third-party proprietary binaries outside the vendor's control and trust domain.
+On a system with S-mode available, we would have the secure monitor on M-mode and those elements on S-mode, but on an M/U-only system we are constrained.
 
-*Threat model*: Having all those elements running at the highest privilege together with the secure monitor, without memory isolation between them, increases the attack surface of the system.
-Also some or all of these elements may be 3rd party proprietary binaries, outside the vendor's control / trust domain. On a system with S-mode available we’d have the secure monitor on M-mode and those elements on S-mode but on an M/U-only system we are constrained and have to come up with another solution.
-
+We propose this proposal to provide primary and secondary contexts on M-mode, achieving isolation between different contexts.
+The extension targets M/U-only systems.
 
 // image::Comparison_of_PMP_and_MPU.png[title="Comparison of PMP and MPU"]
