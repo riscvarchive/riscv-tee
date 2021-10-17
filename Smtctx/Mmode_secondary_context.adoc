@@ -15,7 +15,7 @@ The proposal introduces new fields in mseccfg and pmpcfg, which together impleme
 
 First, we add two new fields in mseccfg: SCP (Secondary context extension present) and PC (Primary context) fields, as shown in the following Figure.
 
-image::TCTX_mseccfg.png[title="mseccfg register format"]
+image::TCTX_mseccfg.png[title="mseccfg register format with secondary context extension."]
 
 - `mseccfg.SCP` (Secondary context extension present): SCP is hardwired to 1 in case this extension is implemented.
 
