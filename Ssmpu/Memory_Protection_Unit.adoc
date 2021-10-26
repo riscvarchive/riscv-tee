@@ -136,16 +136,16 @@ The table below shows which mechanism to use. (Assume both MMU and MPU are imple
 
 [cols="^1,^1", stripes=even, options="header"]
 |===
-|Value in satp|Isolation mechanism
-|0 (bare mode)|MPU only
-|non-zero|MMU only
+|satp|Isolation mechanism
+|satp.mode == Bare|MPU only
+|satp.mode != Bare|MMU only
 |===
 
 We do not allow both MPU and MMU permissions active at the same time now because:
 (1) It will introduce one more layer to check permission for each memory access. This issue will be more serious for guest OS which may have host MPU and guest MPU.
 (2) MMU can provide sufficient protection.
 
-That means, MPU is enabled when satp.mode=Bare and  MPU is implemented.
+That means, MPU is enabled when `satp.mode==Bare` and  MPU is implemented.
 
 
 [NOTE]
