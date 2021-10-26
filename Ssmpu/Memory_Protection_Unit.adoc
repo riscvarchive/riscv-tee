@@ -1,7 +1,8 @@
 [[Memory_Protection_Unit]]
 == Memory Protection Unit(MPU)
 
-An optional RISC-V Memory Protection Unit (MPU) provides per-hart supervisor-mode control registers to allow physical memory access privileges (read, write, execute) to be specified for each physical memory region. The MPU values are checked after the physical address to be accessed pass both the PMA checks and PMP checks described in the privileged spec.
+An optional RISC-V Memory Protection Unit (MPU) provides per-hart supervisor-mode control registers to allow physical memory access privileges (read, write, execute) to be specified for each physical memory region.
+The MPU is checked before the PMA checks and PMP checks, the same as MMU.
 
 Like PMP, the granularity of MPU access control settings are platform-specific and within a platform may vary by physical memory region, but the standard MPU encoding should support regions as small as four bytes. 
 
