@@ -2,10 +2,10 @@
 default: all
 
 smepmp:
-	asciidoctor-pdf -a pdf-style=resources/themes/risc-v_spec-pdf.yml -a pdf-fontsdir=resources/fonts Smepmp/Header.adoc -o Smepmp/Smepmp.pdf
+	asciidoctor-pdf -a pdf-style=resources/themes/risc-v_spec-pdf.yml -a pdf-fontsdir=resources/fonts -a optimize Smepmp/Header.adoc -o Smepmp/Smepmp.pdf
 
 ssmpu:
-	asciidoctor-pdf -a pdf-style=resources/themes/risc-v_spec-pdf.yml -a pdf-fontsdir=resources/fonts Ssmpu/Header.adoc -o Ssmpu/Ssmpu.pdf
+	asciidoctor-pdf -a pdf-style=resources/themes/risc-v_spec-pdf.yml -a pdf-fontsdir=resources/fonts -a optimize Ssmpu/Header.adoc -o Ssmpu/Ssmpu.pdf
 
 all: smepmp ssmpu
 
