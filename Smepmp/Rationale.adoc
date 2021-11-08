@@ -42,11 +42,11 @@ Although it’s possible to use ``mstatus.MPRV`` in M-mode to read/write data on
 +
 _Shared-region_ rules can be used both for zero-copy data transfers and for sharing code segments. The latter may be used for example to allow S/U-mode to execute code by the vendor, that makes use of some vendor-specific ISA extension, without having to go through the firmware with an ecall. This is similar to the vDSO approach followed on Linux, that allows userspace code to execute kernel code without having to perform a system call.
 +
-To make sure that shared data regions can’t be executed and shared code regions can’t be modified, the encoding changes the meaning of the ``pmpcfg.X bit``. In case of shared data regions, with the exception of the ``pmpcfg.LRWX=1111`` encoding, the ``pmpcfg.X`` bit marks the capability of S/U-mode to write to that region, so it’s not possible to encode an executable shared data region. In case of shared code regions, the ``pmpcfg.X`` bit marks the capability of S/U-mode to read from that region, and since ``pmpcfg.RW=01`` is used for encoding the shared region, it’s not possible to encode a shared writable code region.
+To make sure that shared data regions can’t be executed and shared code regions can’t be modified, the encoding changes the meaning of the ``pmpcfg.X bit``. In case of shared data regions, with the exception of the ``pmpcfg.LRWX=1111`` encoding, the ``pmpcfg.X`` bit marks the capability of S/U-mode to write to that region, so it’s not possible to encode an executable shared data region. In case of shared code regions, the ``pmpcfg.X`` bit marks the capability of M-mode to read from that region, and since ``pmpcfg.RW=01`` is used for encoding the shared region, it’s not possible to encode a shared writable code region.
 +
 [NOTE]
 ====
-The capabilities marked by the ``pmpcfg.X`` bit are always available in M-mode but M-mode still can’t execute a shared data region, nor write a shared code region. A _Shared-region_ rule for a shared code region must be added after M-mode has written the code segment there.
+For adding _Shared-region_ rules with executable privileges to share code segments between M-mode and S/U-mode, ``mseccfg.RLB`` needs to be implemented, or else such rules can only be added together with ``mseccfg.MML`` being set on *PMP Reset*. That's because the reserved encoding ``pmpcfg.RW=01`` being used for _Shared-region_ rules is only defined when ``mseccfg.MML`` is set, and 4b prevents the adition of rules with executable privileges on M-mode after ``mseccfg.MML`` is set unless ``mseccfg.MML`` is also set.
 ====
 +
 [INFO]
