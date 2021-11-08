@@ -1,8 +1,8 @@
 [[smepmp]]
 :description: PMP Enhancements for memory access and execution prevention on Machine mode (Smepmp)
 :company: RISC-V.org
-:revdate: 08/2021
-:revnumber: 0.9.4
+:revdate: 11/2021
+:revnumber: 0.9.5
 :revremark: This document is in the Frozen state. Change is extremely unlikely. For more information see: https://riscv.org/spec-state
 :url-riscv: http://riscv.org
 :doctype: book

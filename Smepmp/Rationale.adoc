@@ -1,7 +1,7 @@
 [[rationale]]
 == Rationale
 
-. Since a CSR for security and / or global PMP behavior settings is not available with the current spec, we needed to define a new one. This new CSR will allow us to add further security configuration options in the future and also allow developers to verify the existence of the new mechanisms defined on this proposal. For example the reserved bit8 will be used by Scalar Crypto extension for allowing S-mode access to the entropy source.
+. Since a CSR for security and / or global PMP behavior settings is not available with the current spec, we needed to define a new one. This new CSR will allow us to add further security configuration options in the future and also allow developers to verify the existence of the new mechanisms defined on this proposal.
 
 . There are use cases where developers want to enforce PMP rules in M-mode during the boot process, that are also able to modify, merge, and / or remove later on. Since a rule that is enforced in M-mode also needs to be locked (or else badly written or malicious M-mode software can remove it at any time), the only way for developers to approach this is to keep adding PMP rules to the chain and rely on rule priority. This is a waste of PMP rules and since it’s only needed during boot, ``mseccfg.RLB`` is a simple workaround that can be used temporarily and then disabled and locked down.
 +
@@ -9,7 +9,7 @@ Also when ``mseccfg.MML`` is set, according to 4b it’s not possible to add a _
 +
 [WARNING]
 ====
-*Be aware that RLB introduces a security vulnerability if left set after the boot process is over and in general it should be used with caution, even when used temporarily.* Having editable PMP rules in M-mode gives a false sense of security since it only takes a few malicious instructions to lift any PMP restrictions this way. It doesn’t make sense to have a security control in place and leave it unprotected. Rule Locking Bypass is only meant as a way to optimize the allocation of PMP rules, and allow the bootrom/firmware to register executable _Shared-Region_ rules. If developers / vendors have no use for such functionality, they should never set ``mseccfg.RLB`` and if possible hard-wire it to 0. In any case *RLB should be disabled and locked as soon as possible*.
+*Be aware that RLB introduces a security vulnerability if left set after the boot process is over and in general it should be used with caution, even when used temporarily.* Having editable PMP rules in M-mode gives a false sense of security since it only takes a few malicious instructions to lift any PMP restrictions this way. It doesn’t make sense to have a security control in place and leave it unprotected. Rule Locking Bypass is only meant as a way to optimize the allocation of PMP rules, catch errors durring debugging, and allow the bootrom/firmware to register executable _Shared-Region_ rules. If developers / vendors have no use for such functionality, they should never set ``mseccfg.RLB`` and if possible hard-wire it to 0. In any case *RLB should be disabled and locked as soon as possible*.
 ====
 +
 [NOTE]
