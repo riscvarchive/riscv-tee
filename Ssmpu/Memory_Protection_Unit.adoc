@@ -78,7 +78,7 @@ It is the same as PMP/ePMP.
 
 SMPU has three kinds of rules: *U-mode-only*, *S-mode-only*, and *Shared-Region* rules.
 The S bit marks a rule as *S-mode-only* when set and *U-mode-only* when unset.
-The encoding ``smpucfg.RW=01`` encodes a Shared-Region and ``smpucfg.SRWX=1000`` is reserved for future standard use.
+The encoding ``smpucfg.RW=01`` and ``smpucfg.SRWX=1111`` encode a Shared-Region and ``smpucfg.SRWX=1000`` is reserved for future standard use.
 
 . An _S-mode-only_ rule is *enforced* on Supervisor mode and *denied* on User mode.
 +
