@@ -1,14 +1,19 @@
 [[Memory_Protection_Unit]]
-== Memory Protection Unit(MPU)
+== Memory Protection Unit (MPU)
 
 An optional RISC-V Memory Protection Unit (MPU) provides per-hart supervisor-mode control registers to allow physical memory access privileges (read, write, execute) to be specified for each physical memory region.
-The MPU is checked before the PMA checks and PMP checks, the same as MMU.
+The MPU is checked before the PMA checks and PMP checks, the same as paged virtual memory system (abbr. Sv).
 
 Like PMP, the granularity of MPU access control settings are platform-specific and within a platform may vary by physical memory region, but the standard MPU encoding should support regions as small as four bytes. 
 
 MPU checks will be applied to all accesses for both U mode and S mode, depending on the values in the configuration registers.
 M-mode accesses are not affected and always pass MPU permission checks.
 MPU registers can always be modified by M-mode and S-mode software. MPU registers can grant permissions to U-mode, which has none by default, and revoke permissions from S-mode, which has all permissions allowed through PMP/ePMP by default.
+
+[NOTE]
+====
+We use the term, Sv, to represent paged virtual memory system.
+====
 
 === Requirements
 
@@ -117,7 +122,7 @@ The encoding and results are shown in the table:
 |1|1|1|1 3+|Shared data region: Read only on both S and U mode
 |===
 
-**SUM bit**: We re-use the sstatus.SUM (allow Supervisor User Memory access) bit to modify the privilege with which S-mode loads and stores access physical memory. The semantics of SUM in MPU is consistent with it in paging.
+**SUM bit**: We re-use the sstatus.SUM (allow Supervisor User Memory access) bit to modify the privilege with which S-mode loads and stores access physical memory. The semantics of SUM in MPU is consistent with it in Sv.
 
 
 === Priority and Matching Logic
@@ -132,26 +137,26 @@ Like PMP entries, MPU entries are also statically prioritized. The lowest-number
 3. If the privilege mode of the access is U and no MPU entry matches, but at least one MPU entry is implemented, the access fails;
 4. Otherwise, the access is checked according to the permission bits in the matching MPU entry and is allowed only if it satisfies the permission checking with the S, R, W, or X bit corresponding to the access type.
 
-=== MPU and Paging
-The table below shows which mechanism to use. (Assume both MMU and MPU are implemented.)
+=== MPU and Paging (Sv)
+The table below shows which mechanism to use. (Assume both Sv and MPU are implemented.)
 
 [cols="^1,^1", stripes=even, options="header"]
 |===
 |satp|Isolation mechanism
 |satp.mode == Bare|MPU only
-|satp.mode != Bare|MMU only
+|satp.mode != Bare|Sv only
 |===
 
-We do not allow both MPU and MMU permissions active at the same time now because:
+We do not allow both MPU and Sv permissions active at the same time now because:
 (1) It will introduce one more layer to check permission for each memory access. This issue will be more serious for guest OS which may have host MPU and guest MPU.
-(2) MMU can provide sufficient protection.
+(2) Sv can provide sufficient protection.
 
 That means, MPU is enabled when `satp.mode==Bare` and  MPU is implemented.
 
 
 [NOTE]
 ====
-If page-based virtual memory is not implemented, or when it is disabled, memory accesses check the MPU settings synchronously, so no fence is needed.
+If Sv is not implemented, or when it is disabled, memory accesses check the MPU settings synchronously, so no fence is needed.
 ====
 
 === Exceptions
@@ -159,8 +164,8 @@ Failed accesses generate an exception. MPU follows the strategy that uses differ
 
 The MPU reuses exception codes of page fault for MPU fault.
 This is because page fault is typically delegated to S-mode, and so does MPU, so we can benefit from reusing page fault.
-S-mode software(i.e., OS) can distinguish page fault from MPU fault by checking satp.mode (as mentioned in 2.6, MPU and MMU will not be activated simultaneously).
-The *MPU is proposing to rename page fault to MPU/MMU fault for clarity*.
+S-mode software(i.e., OS) can distinguish page fault from MPU fault by checking satp.mode (as mentioned in 2.6, MPU and Sv will not be activated simultaneously).
+The *MPU is proposing to rename page fault to MPU/Sv fault for clarity*.
 
 Note that a single instruction may generate multiple accesses, which may not be mutually atomic. 
 
@@ -169,9 +174,9 @@ Table of renamed exception codes:
 [cols="^1,^1,^1", stripes=even, options="header"]
 |===
 |Interrupt|Exception Code|Description
-|0|12|Instruction MPU/MMU fault
-|0|13|Load MPU/MMU fault
-|0|15|Store/AMO MPU/MMU fault
+|0|12|Instruction MPU/Sv fault
+|0|13|Load MPU/Sv fault
+|0|15|Store/AMO MPU/Sv fault
 |===
 
 [NOTE]
@@ -179,7 +184,7 @@ Table of renamed exception codes:
 You can refer to the Table 3.6 in riscv-privileged spec.
 ====
 
-*Delegation*: Unlike PMP which uses access faults for violations, MPU uses MPU/MMU faults for violations. The benefit of using MPU/MMU faults is that we can delegate the violations caused by MPU to S-mode, while the access violations caused by PMP can still be handled by machine mode.
+*Delegation*: Unlike PMP which uses access faults for violations, MPU uses MPU/Sv faults for violations. The benefit of using MPU/Sv faults is that we can delegate the violations caused by MPU to S-mode, while the access violations caused by PMP can still be handled by machine mode.
 
 
 
