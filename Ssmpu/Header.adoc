@@ -1,5 +1,5 @@
 [[mpu]]
-:description: RISC-V Memory Protection Unit (MPU)
+:description: RISC-V S-mode Memory Protection Unit (SMPU)
 :company: RISC-V.org
 :revdate: 09/2021
 :revnumber: 0.8.0
@@ -37,7 +37,7 @@ endif::[]
 :footnote:
 :xrefstyle: short
 
-= RISC-V Memory Protection Unit (MPU)
+= RISC-V S-mode Memory Protection Unit (SMPU)
 Dong Du; Xu Lu; Bicheng Yang; Wenhao Li; Yubin Xia; Nick Kossifidis; Joe Xie; Paul Ku; Bill Huffman; Jonathan Behrens; Allen Baum; Robin Zheng; Zeyu Mi; RISC-V TEE Task Group
 
 
