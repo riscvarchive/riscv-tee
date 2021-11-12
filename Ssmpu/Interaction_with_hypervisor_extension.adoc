@@ -1,7 +1,7 @@
 [[Interaction_with_hypervisor_extension]]
 == Interaction with hypervisor extension
 
-To support both SMPU and hypervisor extension, there are some further changes.
+To support both SMPU and hypervisor extension (version: 1.0.0-rc), there are some further changes.
 
 === vSMPU extension
 
