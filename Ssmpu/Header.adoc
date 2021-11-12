@@ -2,7 +2,7 @@
 :description: RISC-V Memory Protection Unit (MPU)
 :company: RISC-V.org
 :revdate: 09/2021
-:revnumber: 0.7.0
+:revnumber: 0.8.0
 :revremark: This document is in the Development state. Assume anything can change. For more information see: https://riscv.org/spec-state
 :url-riscv: http://riscv.org
 :doctype: book
@@ -44,4 +44,5 @@ Dong Du; Xu Lu; Bicheng Yang; Wenhao Li; Yubin Xia; Nick Kossifidis; Joe Xie; Pa
 include::Motivation.adoc[]
 include::Memory_Protection_Unit.adoc[]
 include::Summary_of_Hardware_Changes.adoc[]
+include::Interaction_with_hypervisor_extension.adoc[]
 include::Interaction_with_other_proposals.adoc[]
