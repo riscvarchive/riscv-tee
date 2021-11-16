@@ -4,10 +4,10 @@
 [cols="^1,^1",stripes=even, options="header"]
 |===
 |Item|Changes
-|CSRs for MPU address|64 new CSRs
-|CSRs for MPU configuration|16 new CSRs for RV32 and 8 for RV64
+|CSRs for SMPU address|64 new CSRs
+|CSRs for SMPU configuration|16 new CSRs for RV32 and 8 for RV64
 |CSR for Domain switch|2 new CSRs for RV32 and 1 for RV64
-|Renamed exception code| *_Instruction page fault_* renamed to *_Instruction MPU/MMU fault_* +
-*_Load page fault_* renamed to *_Load MPU/MMU fault_* +
-*_Store/AMO page fault_* renamed to *_Store/AMO MPU/MMU fault_*
+|Renamed exception code| *_Instruction page fault_* renamed to *_Instruction SMPU/Sv fault_* +
+*_Load page fault_* renamed to *_Load SMPU/Sv fault_* +
+*_Store/AMO page fault_* renamed to *_Store/AMO SMPU/Sv fault_*
 |===
