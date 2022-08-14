@@ -7,7 +7,10 @@ smepmp:
 ssmpu:
 	asciidoctor-pdf -a pdf-style=resources/themes/risc-v_spec-pdf.yml -a pdf-fontsdir=resources/fonts -a optimize Ssmpu/Header.adoc -o Ssmpu/Ssmpu.pdf
 
-all: smepmp ssmpu
+smtctx:
+	asciidoctor-pdf -a pdf-style=resources/themes/risc-v_spec-pdf.yml -a pdf-fontsdir=resources/fonts Smtctx/Header.adoc -o Smtctx/Smtctx.pdf
+
+all: smepmp ssmpu smtctx
 
 clean:
-	rm Smepmp/Smepmp.pdf Ssmpu/Ssmpu.pdf
+	rm Smepmp/Smepmp.pdf Ssmpu/Ssmpu.pdf Smtctx/Smtctx.pdf
